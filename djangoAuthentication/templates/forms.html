@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+<form action="{% url 'FormsFunction' %}" method="post">
+  {% csrf_token %}
+<input type="text" name="university_id" value="">
+<br>
+<input type="text" name="course_code" value="">
+<br>
+<input type="number" name="marks" value="">
+<br>
+<input type="submit" name="" value="Save">
+</form>
+  </body>
+</html>

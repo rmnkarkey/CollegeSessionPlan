@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <form action="{% url 'PreFunction' %}" method="post">
+      {% csrf_token %}
+      main Course: <input type="text" name="main" value="">
+      <br>
+      pre Course: <input type="text" name="pre" value="">
+      <br>
+      <input type="submit" name="" value="Save">
+    </form>
+  </body>
+</html>
