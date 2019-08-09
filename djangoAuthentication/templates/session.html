@@ -8,40 +8,49 @@
 
     <form action="{% url 'sessionPlan' %}" method="post">
       {% csrf_token %}
-      session  <input type="text" name="session" value="">
       <br>
-      credit <input type="number" name="credit" value="">
+      Session Name <input type="text" name="session_name" value="{{sessionName}}">
       <br>
-      <input type="submit" name="" value="Search">
-    </form>
-
-
-
-    <table>
-      <tr>
-        <th>Course Code</th>
-        <th>Course Name</th>
-        <th>Offered Session</th>
-      </tr>
-      <tr>
-        <td>
-          {% for i in courseCode %}
-          {{i}}
-          <br>
-          {% endfor %}
-        </td>
-        <td>{% for i in availableCourse %}
-            {{i}}
+      Session Year <input type="number" name="session_year" value="{{sessionYear}}">
+      <br>
+      session  <input type="text" name="session" value="{{session}}">
+      <input type="submit" name="One" value="Search">
+      <br>
+      <table>
+        <tr>
+          <th>Course Code</th>
+          <th>Course Name</th>
+          <th>Credit</th>
+          <th>Offered</th>
+        </tr>
+        <tr>
+          <td>
+            {% for i in courseCode %}
+            <input type="text" name="course_code[]" value="{{i}}">
             <br>
-        {% endfor %}
-      </td>
-        <td>
-          {% for i in courseCredit %}
-          {{i}}
-          <br>
+            {% endfor %}
+          </td>
+          <td>{% for i in availableCourse %}
+              <input type="text" name="availableCourse" value="{{i}}">
+              <br>
           {% endfor %}
         </td>
-      </tr>
-    </table>
+          <td>
+            {% for i in courseCredit %}
+            <input type="text" name="courseCredit" value="{{i}}">
+            <br>
+            {% endfor %}
+          </td>
+          <td>
+            {% if availableCourse %}
+              <input type="text" name="offered" value="Yes">
+              <br>
+              {% endif %}
+          </td>
+        </tr>
+      </table>
+      <input type="submit" name="Two" value="Save">
+    </form>
+    <br>
   </body>
 </html>

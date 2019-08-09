@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes,renderer_classes
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from .models import CourseManagement,StudentManagement,GradeManagement,StatusTable,DeadLine,OfferedCourses
+from .models import CourseManagement,StudentManagement,GradeManagement,StatusTable,DeadLine,OfferedCourses,SessionTable
 from .serializers import CourseSerializer,StudentSerializer,GradeManagementSerializer,StatusTableSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
@@ -180,20 +180,36 @@ def SearchFuction(request):
         return render(request,'search.html')
 
 def sessionPlan(request):
-    if request.method=="POST":
+    if 'One' in request.POST:
         session = request.POST['session']
-        credit = request.POST['credit']
+        sessionName = request.POST['session_name']
+        sessionYear = request.POST['session_year']
         matchSession = OfferedCourses.objects.filter(session = session)
         availableCourse=[]
         courseSession=[]
         courseCode=[]
         courseCredit=[]
-
         for i in matchSession:
             availableCourse.append(i.courseCode.course_name)
             courseCode.append(i.courseCode.course_code)
             course = CourseManagement.objects.get(course_code=i.courseCode.course_code)
             courseCredit.append(course.credit)
-        return render(request,'session.html',{'availableCourse':availableCourse,'courseCode':courseCode,'courseSession':courseSession,'courseCredit':courseCredit})
+        return render(request,'session.html',{'session':session,'sessionName':sessionName,'sessionYear':sessionYear,'yes':'Yes','availableCourse':availableCourse,'courseCode':courseCode,'courseSession':courseSession,'courseCredit':courseCredit})
+    elif 'Two' in request.POST:
+        session = request.POST['session']
+        sessionName = request.POST['session_name']
+        sessionYear = request.POST['session_year']
+        sessionCredit = request.POST['courseCredit']
+        course = request.POST.getlist('course_code')
+        matchSession = OfferedCourses.objects.filter(session = session)
+        offer = request.POST['offered']
+        availableCourse=[]
+        for i in matchSession:
+            availableCourse.append(i.courseCode.course_code)
+        print(availableCourse)
+        for i in availableCourse:
+            courseTable = CourseManagement.objects.get(course_code=i)
+            off = SessionTable.objects.create(courseCode=courseTable,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered=offer)
+        return render(request,'session.html',{'two':session})
     else:
         return render(request,'session.html')

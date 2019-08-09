@@ -24,7 +24,7 @@ class SessionTable(models.Model):
     session_session = models.CharField(max_length=100)
     courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
     session_credit = models.IntegerField(max_length=1)
-    Offered=models.BooleanField()
+    Offered=models.CharField(max_length=3)
 
 class DeadLine(models.Model):
     course_code = models.ForeignKey(CourseManagement,on_delete=models.Model)
