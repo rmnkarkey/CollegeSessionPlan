@@ -7,10 +7,24 @@ from django.db.models.signals import pre_save
 class CourseManagement(models.Model):
     course_code = models.CharField(max_length=50,primary_key=True)
     course_name = models.CharField(max_length=50)
-    year = models.IntegerField()
-    credit = models.IntegerField()
-    session = models.CharField(max_length=100)
+    credit = models.IntegerField(max_length=1)
     prerequisite = models.CharField(max_length=299,default=None)
+
+    def __str__(self):
+        return self.course_name
+
+class OfferedCourses(models.Model):
+    id = models.IntegerField(primary_key=True)
+    courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
+    session = models.CharField(max_length=4)
+
+class SessionTable(models.Model):
+    session_name = models.CharField(max_length=200)
+    session_year = models.IntegerField(max_length=4)
+    session_session = models.CharField(max_length=100)
+    courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
+    session_credit = models.IntegerField(max_length=1)
+    Offered=models.BooleanField()
 
 class DeadLine(models.Model):
     course_code = models.ForeignKey(CourseManagement,on_delete=models.Model)

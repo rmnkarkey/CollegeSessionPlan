@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes,renderer_classes
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from .models import CourseManagement,StudentManagement,GradeManagement,StatusTable,DeadLine
+from .models import CourseManagement,StudentManagement,GradeManagement,StatusTable,DeadLine,OfferedCourses
 from .serializers import CourseSerializer,StudentSerializer,GradeManagementSerializer,StatusTableSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
@@ -178,3 +178,22 @@ def SearchFuction(request):
         return render(request,'search.html',{'course':course})
     else:
         return render(request,'search.html')
+
+def sessionPlan(request):
+    if request.method=="POST":
+        session = request.POST['session']
+        credit = request.POST['credit']
+        matchSession = OfferedCourses.objects.filter(session = session)
+        availableCourse=[]
+        courseSession=[]
+        courseCode=[]
+        courseCredit=[]
+
+        for i in matchSession:
+            availableCourse.append(i.courseCode.course_name)
+            courseCode.append(i.courseCode.course_code)
+            course = CourseManagement.objects.get(course_code=i.courseCode.course_code)
+            courseCredit.append(course.credit)
+        return render(request,'session.html',{'availableCourse':availableCourse,'courseCode':courseCode,'courseSession':courseSession,'courseCredit':courseCredit})
+    else:
+        return render(request,'session.html')
