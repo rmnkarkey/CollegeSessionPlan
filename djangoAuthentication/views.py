@@ -197,19 +197,42 @@ def sessionPlan(request):
         return render(request,'session.html',{'session':session,'sessionName':sessionName,'sessionYear':sessionYear,'yes':'Yes','availableCourse':availableCourse,'courseCode':courseCode,'courseSession':courseSession,'courseCredit':courseCredit})
     elif 'Two' in request.POST:
         session = request.POST['session']
+        # check = request.POST.getlist('overwrite')
+        # print(check)
+        offer = request.POST.getlist('checkBox')
+        # print(offer)
         sessionName = request.POST['session_name']
         sessionYear = request.POST['session_year']
         sessionCredit = request.POST['courseCredit']
-        course = request.POST.getlist('course_code')
         matchSession = OfferedCourses.objects.filter(session = session)
-        offer = request.POST['offered']
         availableCourse=[]
         for i in matchSession:
             availableCourse.append(i.courseCode.course_code)
-        print(availableCourse)
-        for i in availableCourse:
-            courseTable = CourseManagement.objects.get(course_code=i)
-            off = SessionTable.objects.create(courseCode=courseTable,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered=offer)
+        courseCode = request.POST.getlist('course_code')
+        # print(courseCode)
+        course=''
+        for i in courseCode:
+            course = CourseManagement.objects.get(course_code=i)
+            # print(course.course_code)
+        a=course.course_code
+        print(',,,,')
+        print(courseCode)
+        for j in courseCode:
+            if j in offer:
+                off = SessionTable.objects.create(courseCode_id=a,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="Yes")
+                break
+            else:
+                off = SessionTable.objects.create(courseCode_id=a,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="No")
+                break
+        # for i in availableCourse:
+            # courseTable = CourseManagement.objects.get(course_code=i)
+            # for jk in offer:
+            #     print(jk)
+            #     if jk == courseTable.course_code:
+            #         off = SessionTable.objects.create(courseCode=courseTable,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="Yes")
+            #         break
+            #     else:
+            #         off = SessionTable.objects.create(courseCode=courseTable,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="No")
         return render(request,'session.html',{'two':session})
     else:
         return render(request,'session.html')

@@ -18,15 +18,21 @@
       <br>
       <table>
         <tr>
+          <th>Offered</th>
           <th>Course Code</th>
           <th>Course Name</th>
           <th>Credit</th>
-          <th>Offered</th>
         </tr>
         <tr>
           <td>
             {% for i in courseCode %}
-            <input type="text" name="course_code[]" value="{{i}}">
+            <input type="checkbox" name="checkBox" value="{{i}}">
+            <br>
+            {% endfor %}
+          </td>
+          <td>
+            {% for i in courseCode %}
+            <input type="text" name="course_code" value="{{i}}">
             <br>
             {% endfor %}
           </td>
@@ -40,12 +46,6 @@
             <input type="text" name="courseCredit" value="{{i}}">
             <br>
             {% endfor %}
-          </td>
-          <td>
-            {% if availableCourse %}
-              <input type="text" name="offered" value="Yes">
-              <br>
-              {% endif %}
           </td>
         </tr>
       </table>
