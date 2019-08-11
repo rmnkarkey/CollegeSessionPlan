@@ -135,3 +135,7 @@ class StatusTable(models.Model):
     course_code = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
     session = models.CharField(max_length=299)
     status = models.CharField(max_length=299)
+
+class CourseEnrollment(models.Model):
+    univ_id = models.ForeignKey(StudentManagement,on_delete=models.CASCADE)
+    courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)

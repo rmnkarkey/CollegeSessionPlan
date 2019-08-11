@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <table>
+
+    <tr>
+      <th>Semester Year</th>
+      <th>Session</th>
+      <th>Max credit</th>
+      <th>Course Code</th>
+      <th>Course Credit</th>
+      <th>Offered</th>
+    </tr>
+    {% for i in course %}
+    <tr>
+      <td>{{i.session_year}}</td>
+      <td>{{i.session_session}}</td>
+      <td>{{i.max_credit}}</td>
+      <td>{{i.courseCode}}</td>
+      <td>{{i.session_credit}}</td>
+      <td>{{i.Offered}}</td>
+      <br>
+    </tr>
+    {% endfor %}
+  </table>
+  </body>
+</html>

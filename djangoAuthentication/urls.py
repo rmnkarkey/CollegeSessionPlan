@@ -18,5 +18,6 @@ urlpatterns=[
     path('stats/',views.statFunction,name='statFunction'),
     path('available/',views.AvailableCourse,name='available'),
     path('course-search/',views.SearchFuction,name='SearchFuction'),
-    path('session-plan/',views.sessionPlan,name='sessionPlan')
+    path('session-plan/',views.sessionPlan,name='sessionPlan'),
+    path('course-register/',views.courseRegister,name='courseRegister')
 ]
