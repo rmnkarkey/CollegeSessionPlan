@@ -216,14 +216,17 @@ def sessionPlan(request):
             # print(course.course_code)
         a=course.course_code
         print(',,,,')
-        print(courseCode)
+        # print(offer)
         for j in courseCode:
-            if j in offer:
-                off = SessionTable.objects.create(courseCode_id=a,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="Yes")
-                break
-            else:
-                off = SessionTable.objects.create(courseCode_id=a,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="No")
-                break
+            # if j in offer:
+            for i in offer:
+                course = CourseManagement.objects.get(course_code=i)
+                print(course.course_code)
+                if course.course_code == i:
+                    off = SessionTable.objects.create(courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="Yes")
+                else:
+                    off = SessionTable.objects.create(courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=sessionCredit,Offered="No")
+            break
         # for i in availableCourse:
             # courseTable = CourseManagement.objects.get(course_code=i)
             # for jk in offer:
