@@ -22,6 +22,7 @@ class SessionTable(models.Model):
     session_name = models.CharField(max_length=200)
     session_year = models.IntegerField(max_length=4)
     session_session = models.CharField(max_length=100)
+    max_credit = models.IntegerField(default=0)
     courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
     session_credit = models.IntegerField(max_length=1)
     Offered=models.CharField(max_length=3)
