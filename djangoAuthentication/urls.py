@@ -20,5 +20,7 @@ urlpatterns=[
     path('course-search/',views.SearchFuction,name='SearchFuction'),
     path('session-plan/',views.sessionPlan,name='sessionPlan'),
     path('course-register/',views.courseRegister,name='courseRegister'),
-    path('session-planning/',views.saveFunction,name='saveFunction')
+    path('session-planning/',views.saveFunction,name='saveFunction'),
+    path('update-session/',views.updateSession,name='updateSession'),
+    path('update-session/<int:id>/',views.updateSessionView,name='updateSessionView')
 ]

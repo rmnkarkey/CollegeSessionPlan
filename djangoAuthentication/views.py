@@ -288,10 +288,66 @@ def saveFunction(request):
         sessionSer = SessionTableSerializer(session,many=True)
         return Response(sessionSer.data)
 
-
+# @api_view(['GET','POST'])
 def courseRegister(request):
     if request.method=='POST':
         pass
     else:
         course = SessionTable.objects.all()
         return render(request,'register.html',{'course':course})
+
+@api_view(['GET'])
+def updateSession(request):
+    session = SessionTable.objects.all()
+    sessionSer = SessionTableSerializer(session,many=True)
+    return Response(sessionSer.data)
+
+@api_view(['GET','PUT',"DELETE"])
+def updateSessionView(request,id):
+    if request.method=="PUT":
+        # session = SessionTable.objects.get(id=id)
+        # session_name=request.data['session_name']
+        # session_year=request.data['session_year']
+        # session_session=request.data['session_session']
+        # max_credit=request.data['max_credit']
+        # courseCode=request.data['courseCode']
+        # session_credit=request.data['session_credit']
+        # Offered=request.data['Offered']
+        #
+        try:
+            session = SessionTable.objects.get(id=id)
+            if session:
+                instance = SessionTable.objects.get(id=id)
+                serializer = SessionTableSerializer(instance,data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
+        except SessionTable.DoesNotExist:
+            return Response('Not found')
+
+    elif request.method=="DELETE":
+        try:
+            instance = SessionTable.objects.get(id=id)
+            if instance:
+                instance.delete()
+                return Response('Session Deleted')
+        except SessionTable.DoesNotExist:
+            return Response("session not found")
+
+    else:
+        try:
+            session = SessionTable.objects.get(id=id)
+            code = session.courseCode
+            if session:
+                response={
+                'session_name':session.session_name,
+                'session_year':session.session_year,
+                'session_session':session.session_session,
+                'max_credit':session.max_credit,
+                'courseCode':str(code),
+                'session_course_credit':session.session_credit,
+                'Offered':session.Offered,
+                }
+                return Response(response)
+        except SessionTable.DoesNotExist:
+            return Response('Not found')

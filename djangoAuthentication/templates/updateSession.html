@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <th>session_name</th>
+        <th>session_year</th>
+        <th>session</th>
+        <th>courseCode</th>
+        <th>Course Credit</th>
+        <th>Offered</th>
+      </tr>
+      <tr>
+        <td>
+          {% for i in session %}
+          <li>{{i.session_name}}</li>
+          <br>
+          {% endfor %}
+        </td>
+        <td>
+          {% for i in session %}
+          <li>{{i.session_year}}</li>
+          <br>
+          {% endfor %}
+        </td>
+        <td>
+          {% for i in session %}
+          <li>{{i.session_session}}</li>
+          <br>
+          {% endfor %}
+        </td>
+        <td>
+          {% for i in session %}
+          <li>{{i.courseCode}}</li>
+          <br>
+          {% endfor %}
+        </td>
+        <td>
+          {% for i in session %}
+          <li>{{i.session_credit}}</li>
+          <br>
+          {% endfor %}
+        </td>
+        <td>
+          {% for i in session %}
+          <li>{{i.Offered}}</li>
+          <br>
+          {% endfor %}
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
