@@ -182,58 +182,107 @@ def SearchFuction(request):
 @api_view(['GET','POST'])
 def sessionPlan(request):
     if request.method == "POST":
-        if 'One' in request.POST:
-            session = request.POST['session']
-            sessionName = request.POST['session_name']
-            sessionYear = request.POST['session_year']
-            maxCredit = request.POST['max_credit']
-            startDate = request.POST['startdate']
-            deadline = request.POST['deadline']
-            matchSession = OfferedCourses.objects.filter(session = session)
-            availableCourse=[]
-            courseSession=[]
-            courseCode=[]
-            courseCredit=[]
-            for i in matchSession:
-                availableCourse.append(i.courseCode.course_name)
-                courseCode.append(i.courseCode.course_code)
-                course = CourseManagement.objects.get(course_code=i.courseCode.course_code)
-                courseCredit.append(course.credit)
-            dictionary ={'maxCredit':maxCredit,'session':session,'sessionName':sessionName,'sessionYear':sessionYear,'yes':'Yes','availableCourse':availableCourse,'courseCode':courseCode,'courseSession':courseSession,'courseCredit':courseCredit}
-            if matchSession:
-                return Response(dictionary)
-            else:
-                return Response("not found")
+        session = request.data['session']
+        # sessionName = request.data['session_name']
+        # sessionYear = request.data['session_year']
+        # maxCredit = request.data['max_credit']
+        # startDate = request.data['startdate']
+        # deadline = request.data['deadline']
+        matchSession = OfferedCourses.objects.filter(session = session)
+        courseSession=[]
+        availableCourse=[]
+        courseCode=[]
+        courseCredit=[]
+        for i in matchSession:
+            availableCourse.append(i.courseCode.course_name)
+            courseCode.append(i.courseCode.course_code)
+            course = CourseManagement.objects.get(course_code=i.courseCode.course_code)
+            courseCredit.append(course.credit)
+        dictionary ={'session':session,'availableCourse':availableCourse,'courseCode':courseCode,'courseCredit':courseCredit}
+        if matchSession:
+            return Response(dictionary)
+        else:
+            return Response("not found")
 
-        elif 'Two' in request.POST:
-            session = request.POST['session']
-            offer = request.POST.getlist('checkBox')
-            sessionName = request.POST['session_name']
-            sessionYear = request.POST['session_year']
-            sessionCredit = request.POST['courseCredit']
-            maxCredit = request.POST['max_credit']
-            startDate = request.POST['startdate']
-            deadline = request.POST['deadline']
-            matchSession = OfferedCourses.objects.filter(session = session)
-            availableCourse=[]
-            for i in matchSession:
-                availableCourse.append(i.courseCode.course_code)
-            courseCode = request.POST.getlist('course_code')
-            course=''
-            for i in courseCode:
+        # elif 'Two' in request.POST:
+        #     session = request.POST['session']
+        #     offer = request.POST.getlist('checkBox')
+        #     sessionName = request.POST['session_name']
+        #     sessionYear = request.POST['session_year']
+        #     sessionCredit = request.POST['courseCredit']
+        #     maxCredit = request.POST['max_credit']
+        #     startDate = request.POST['startdate']
+        #     deadline = request.POST['deadline']
+        #     matchSession = OfferedCourses.objects.filter(session = session)
+        #     availableCourse=[]
+        #     for i in matchSession:
+        #         availableCourse.append(i.courseCode.course_code)
+        #     courseCode = request.POST.getlist('course_code')
+        #     course=''
+        #     for i in courseCode:
+        #         course = CourseManagement.objects.get(course_code=i)
+        #     a=course.course_code
+        #     for j in courseCode:
+        #         for i in offer:
+        #             course = CourseManagement.objects.get(course_code=i)
+        #             print(course.credit)
+        #             if course.course_code == i:
+        #                 off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="Yes")
+        #                 dLine = DeadLine.objects.create(course_code_id=course.course_code,start_date=startDate,end_date=deadline)
+        #             else:
+        #                 off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="No")
+        #         break
+        #     return Response("success")
+    else:
+        session = SessionTable.objects.all()
+        sessionSer = SessionTableSerializer(session,many=True)
+        return Response(sessionSer.data)
+
+@api_view(['GET','POST'])
+def saveFunction(request):
+    if request.method=="POST":
+        session = request.data['session']
+        # print(session)
+        # print('....')
+        # offer = request.POST.get('checkBox', False)
+        offer = request.data.get('checkBox')
+        # offer = request.data.getlist('checkBox')
+        # print(offer,'........')
+        sessionName = request.data['session_name']
+        # print(sessionName)
+        sessionYear = request.data['session_year']
+        # print(sessionYear)
+        # sessionCredit = request.data['courseCredit']
+        maxCredit = request.data['max_credit']
+        # print(maxCredit)
+        startDate = request.data['startdate']
+        # print(startDate)
+        deadline = request.data['deadline']
+        # print(deadline)
+        # print(',,,,,')
+        matchSession = OfferedCourses.objects.filter(session = session)
+        # print(matchSession)
+        # print('....')
+        availableCourse=[]
+        for i in matchSession:
+            availableCourse.append(i.courseCode.course_code)
+        courseCode = request.data.get('course_code')
+        print(courseCode)
+        course=''
+        for i in courseCode:
+            course = CourseManagement.objects.get(course_code=i)
+        # a=course.course_code
+        for j in courseCode:
+            for i in offer:
                 course = CourseManagement.objects.get(course_code=i)
-            a=course.course_code
-            for j in courseCode:
-                for i in offer:
-                    course = CourseManagement.objects.get(course_code=i)
-                    print(course.credit)
-                    if course.course_code == i:
-                        off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="Yes")
-                        dLine = DeadLine.objects.create(course_code_id=course.course_code,start_date=startDate,end_date=deadline)
-                    else:
-                        off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="No")
-                break
-            return Response("success")
+                print(course.credit)
+                if course.course_code == i:
+                    off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="Yes")
+                    dLine = DeadLine.objects.create(course_code_id=course.course_code,start_date=startDate,end_date=deadline)
+                else:
+                    off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="No")
+            break
+        return Response("success")
     else:
         session = SessionTable.objects.all()
         sessionSer = SessionTableSerializer(session,many=True)

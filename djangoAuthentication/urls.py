@@ -19,5 +19,6 @@ urlpatterns=[
     path('available/',views.AvailableCourse,name='available'),
     path('course-search/',views.SearchFuction,name='SearchFuction'),
     path('session-plan/',views.sessionPlan,name='sessionPlan'),
-    path('course-register/',views.courseRegister,name='courseRegister')
+    path('course-register/',views.courseRegister,name='courseRegister'),
+    path('session-planning/',views.saveFunction,name='saveFunction')
 ]
