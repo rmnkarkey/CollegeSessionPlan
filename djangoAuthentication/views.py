@@ -11,10 +11,11 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes,renderer_classes
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from .models import CourseManagement,StudentManagement,GradeManagement,StatusTable,DeadLine,OfferedCourses,SessionTable,DeadLine
-from .serializers import CourseSerializer,StudentSerializer,GradeManagementSerializer,StatusTableSerializer,SessionTableSerializer
+from .models import CourseManagement,StudentManagement,GradeManagement,OfferedCourses,SessionNameTable,SessionCourseTable
+from .serializers import SessionNameSerializer,CourseSerializer,StudentSerializer,GradeManagementSerializer,StatusTableSerializer,SessionNameTableSerializer,SessionCourseTableSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
+from django.utils import timezone
 
 @api_view(['POST'])
 @permission_classes([AllowAny,])
@@ -179,15 +180,74 @@ def SearchFuction(request):
     else:
         return render(request,'search.html')
 
+# def courseRegister(request):
+#     if request.method=='POST':
+#         pass
+#     else:
+#         course = SessionTable.objects.all()
+#         return render(request,'register.html',{'course':course})
+
+# @api_view(['GET'])
+# def updateSession(request):
+#     session = SessionTable.objects.all()
+#     sessionSer = SessionTableSerializer(session,many=True)
+#     return Response(sessionSer.data)
+
+# @api_view(['GET','PUT',"DELETE"])
+# def updateSessionView(request,id):
+#     if request.method=="PUT":
+#         # session = SessionTable.objects.get(id=id)
+#         # session_name=request.data['session_name']
+#         # session_year=request.data['session_year']
+#         # session_session=request.data['session_session']
+#         # max_credit=request.data['max_credit']
+#         # courseCode=request.data['courseCode']
+#         # session_credit=request.data['session_credit']
+#         # Offered=request.data['Offered']
+#         #
+#         try:
+#             session = SessionTable.objects.get(id=id)
+#             if session:
+#                 instance = SessionTable.objects.get(id=id)
+#                 serializer = SessionTableSerializer(instance,data=request.data)
+#                 if serializer.is_valid():
+#                     serializer.save()
+#                     return Response(serializer.data)
+#         except SessionTable.DoesNotExist:
+#             return Response('Not found')
+#
+#     elif request.method=="DELETE":
+#         try:
+#             instance = SessionTable.objects.get(id=id)
+#             if instance:
+#                 instance.delete()
+#                 return Response('Session Deleted')
+#         except SessionTable.DoesNotExist:
+#             return Response("session not found")
+#
+#     else:
+#         try:
+#             session = SessionTable.objects.get(id=id)
+#             code = session.courseCode
+#             if session:
+#                 response={
+#                 'session_name':session.session_name,
+#                 'session_year':session.session_year,
+#                 'session_session':session.session_session,
+#                 'max_credit':session.max_credit,
+#                 'courseCode':str(code),
+#                 'session_course_credit':session.course_credit,
+#                 'Offered':session.Offered,
+#                 }
+#                 return Response(response)
+#         except SessionTable.DoesNotExist:
+#             return Response('Not found')
+
+#search Function for session
 @api_view(['GET','POST'])
 def sessionPlan(request):
     if request.method == "POST":
         session = request.data['session']
-        # sessionName = request.data['session_name']
-        # sessionYear = request.data['session_year']
-        # maxCredit = request.data['max_credit']
-        # startDate = request.data['startdate']
-        # deadline = request.data['deadline']
         matchSession = OfferedCourses.objects.filter(session = session)
         courseSession=[]
         availableCourse=[]
@@ -203,151 +263,105 @@ def sessionPlan(request):
             return Response(dictionary)
         else:
             return Response("not found")
-
-        # elif 'Two' in request.POST:
-        #     session = request.POST['session']
-        #     offer = request.POST.getlist('checkBox')
-        #     sessionName = request.POST['session_name']
-        #     sessionYear = request.POST['session_year']
-        #     sessionCredit = request.POST['courseCredit']
-        #     maxCredit = request.POST['max_credit']
-        #     startDate = request.POST['startdate']
-        #     deadline = request.POST['deadline']
-        #     matchSession = OfferedCourses.objects.filter(session = session)
-        #     availableCourse=[]
-        #     for i in matchSession:
-        #         availableCourse.append(i.courseCode.course_code)
-        #     courseCode = request.POST.getlist('course_code')
-        #     course=''
-        #     for i in courseCode:
-        #         course = CourseManagement.objects.get(course_code=i)
-        #     a=course.course_code
-        #     for j in courseCode:
-        #         for i in offer:
-        #             course = CourseManagement.objects.get(course_code=i)
-        #             print(course.credit)
-        #             if course.course_code == i:
-        #                 off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="Yes")
-        #                 dLine = DeadLine.objects.create(course_code_id=course.course_code,start_date=startDate,end_date=deadline)
-        #             else:
-        #                 off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="No")
-        #         break
-        #     return Response("success")
     else:
-        session = SessionTable.objects.all()
-        sessionSer = SessionTableSerializer(session,many=True)
+        session = SessionNameTable.objects.all()
+        sessionSer = SessionNameTableSerializer(session,many=True)
+        return Response(sessionSer.data)
+
+
+@api_view(['GET','POST'])
+def InsertSessionName(request):
+    if request.method=='POST':
+        session_name=request.data['session_name']
+        session_year=request.data['session_year']
+        date_created=timezone.now().date()
+        max_credit=request.data['max_credit']
+        start_date=request.data['start_date']
+        end_date=request.data['end_date']
+        session_name=SessionNameTable.objects.create(session_name=session_name,session_year=session_year,date_created=date_created,max_credit=max_credit,start_date=start_date,end_date=end_date)
+        return Response("Succesfully Saved")
+    else:
+        session = SessionNameTable.objects.all()
+        sessionSer = SessionNameTableSerializer(session,many=True)
         return Response(sessionSer.data)
 
 @api_view(['GET','POST'])
-def saveFunction(request):
+def InsertSessionNameDetail(request,session_name):
     if request.method=="POST":
-        session = request.data['session']
-        # print(session)
-        # print('....')
-        # offer = request.POST.get('checkBox', False)
+        session = SessionNameTable.objects.get(session_name=session_name)
+        # print(session.session_name)
+        session_session=request.data['session_session']
         offer = request.data.get('checkBox')
-        # offer = request.data.getlist('checkBox')
-        # print(offer,'........')
-        sessionName = request.data['session_name']
-        # print(sessionName)
-        sessionYear = request.data['session_year']
-        # print(sessionYear)
-        # sessionCredit = request.data['courseCredit']
-        maxCredit = request.data['max_credit']
-        # print(maxCredit)
-        startDate = request.data['startdate']
-        # print(startDate)
-        deadline = request.data['deadline']
-        # print(deadline)
-        # print(',,,,,')
-        matchSession = OfferedCourses.objects.filter(session = session)
-        # print(matchSession)
-        # print('....')
-        availableCourse=[]
-        for i in matchSession:
-            availableCourse.append(i.courseCode.course_code)
-        courseCode = request.data.get('course_code')
+        courseCode = request.data.get('courseCode')
+        print('................')
         print(courseCode)
+        print('................')
         course=''
-        for i in courseCode:
-            course = CourseManagement.objects.get(course_code=i)
-        # a=course.course_code
         for j in courseCode:
-            for i in offer:
-                course = CourseManagement.objects.get(course_code=i)
-                print(course.credit)
-                if course.course_code == i:
-                    off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="Yes")
-                    dLine = DeadLine.objects.create(course_code_id=course.course_code,start_date=startDate,end_date=deadline)
-                else:
-                    off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,session_credit=int(course.credit),Offered="No")
-            break
-        return Response("success")
+            course = CourseManagement.objects.get(course_code=j)
+            print(course.credit)
+            if course.course_code == j:
+                course_session = SessionCourseTable.objects.create(session_name_id=session.session_name,session_session=session_session,courseCode_id=course.course_code,course_credit=course.credit,Offered="Yes")
+        return Response('saved')        
     else:
-        session = SessionTable.objects.all()
-        sessionSer = SessionTableSerializer(session,many=True)
+        session = SessionCourseTable.objects.all()
+        sessionSer = SessionCourseTableSerializer(session,many=True)
+        return Response(sessionSer.data)
+
+@api_view(['GET'])
+def listOfSession(request):
+    if request.method=="GET":
+        session = SessionNameTable.objects.all()
+        sessionSer = SessionNameSerializer(session,many=True)
         return Response(sessionSer.data)
 
 # @api_view(['GET','POST'])
-def courseRegister(request):
-    if request.method=='POST':
-        pass
-    else:
-        course = SessionTable.objects.all()
-        return render(request,'register.html',{'course':course})
-
-@api_view(['GET'])
-def updateSession(request):
-    session = SessionTable.objects.all()
-    sessionSer = SessionTableSerializer(session,many=True)
-    return Response(sessionSer.data)
-
-@api_view(['GET','PUT',"DELETE"])
-def updateSessionView(request,id):
-    if request.method=="PUT":
-        # session = SessionTable.objects.get(id=id)
-        # session_name=request.data['session_name']
-        # session_year=request.data['session_year']
-        # session_session=request.data['session_session']
-        # max_credit=request.data['max_credit']
-        # courseCode=request.data['courseCode']
-        # session_credit=request.data['session_credit']
-        # Offered=request.data['Offered']
-        #
-        try:
-            session = SessionTable.objects.get(id=id)
-            if session:
-                instance = SessionTable.objects.get(id=id)
-                serializer = SessionTableSerializer(instance,data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data)
-        except SessionTable.DoesNotExist:
-            return Response('Not found')
-
-    elif request.method=="DELETE":
-        try:
-            instance = SessionTable.objects.get(id=id)
-            if instance:
-                instance.delete()
-                return Response('Session Deleted')
-        except SessionTable.DoesNotExist:
-            return Response("session not found")
-
-    else:
-        try:
-            session = SessionTable.objects.get(id=id)
-            code = session.courseCode
-            if session:
-                response={
-                'session_name':session.session_name,
-                'session_year':session.session_year,
-                'session_session':session.session_session,
-                'max_credit':session.max_credit,
-                'courseCode':str(code),
-                'session_course_credit':session.session_credit,
-                'Offered':session.Offered,
-                }
-                return Response(response)
-        except SessionTable.DoesNotExist:
-            return Response('Not found')
+# def saveFunction(request):
+#     if request.method=="POST":
+#         session = request.data['session']
+#         # print(session)
+#         # print('... .')
+#         # offer = request.POST.get('checkBox', False)
+#         offer = request.data.get('checkBox')
+#         # offer = request.data.getlist('checkBox')
+#         # print(offer,'........')
+#         sessionName = request.data['session_name']
+#         # print(sessionName)
+#         sessionYear = request.data['session_year']
+#         # print(sessionYear)
+#         # sessionCredit = request.data['courseCredit']
+#         maxCredit = request.data['max_credit']
+#         # print(maxCredit)
+#         startDate = request.data['startdate']
+#         # print(startDate)
+#         deadline = request.data['deadline']
+#         # print(deadline)
+#         # print(',,,,,')
+#         matchSession = OfferedCourses.objects.filter(session = session)
+#         # print(matchSession)
+#         # print('....')
+#         availableCourse=[]
+#         for i in matchSession:
+#             availableCourse.append(i.courseCode.course_code)
+#         courseCode = request.data.get('course_code')
+#         print(courseCode)
+#         course=''
+#         for i in courseCode:
+#             course = CourseManagement.objects.get(course_code=i)
+#         # a=course.course_code
+#         for j in courseCode:
+#             for i in offer:
+#                 course = CourseManagement.objects.get(course_code=i)
+#                 print(course.credit)
+#                 if course.course_code == i:
+#                     off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,course_credit=int(course.credit),Offered="Yes")
+#                 else:
+#                     off = SessionTable.objects.create(max_credit=int(maxCredit),courseCode_id=course.course_code,session_name=sessionName,session_year=sessionYear,session_session=session,course_credit=int(course.credit),Offered="No")
+#             break
+#         return Response("success")
+#     else:
+#         session = SessionTable.objects.all()
+#         sessionSer = SessionTableSerializer(session,many=True)
+#         return Response(sessionSer.data)
+#
+# @api_view(['GET','POST'])

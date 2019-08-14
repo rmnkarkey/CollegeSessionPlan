@@ -18,19 +18,20 @@ class OfferedCourses(models.Model):
     courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
     session = models.CharField(max_length=4)
 
-class SessionTable(models.Model):
-    session_name = models.CharField(max_length=200)
+class SessionNameTable(models.Model):
+    session_name=models.CharField(primary_key=True,max_length=100)
     session_year = models.IntegerField(max_length=4)
-    session_session = models.CharField(max_length=100)
-    max_credit = models.IntegerField(default=0)
-    courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
-    session_credit = models.IntegerField(max_length=1)
-    Offered=models.CharField(max_length=3)
-
-class DeadLine(models.Model):
-    course_code = models.ForeignKey(CourseManagement,on_delete=models.Model)
+    date_created=models.DateField(default=timezone.now().date())
+    max_credit = models.IntegerField()
     start_date = models.DateField(default=timezone.now().date())
     end_date = models.DateField(default=timezone.now().date())
+
+class SessionCourseTable(models.Model):
+    session_name = models.ForeignKey(SessionNameTable,on_delete=models.CASCADE)
+    session_session = models.CharField(max_length=100)
+    courseCode = models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
+    course_credit = models.IntegerField(max_length=1)
+    Offered=models.CharField(max_length=3)
 
 class StudentManagement(models.Model):
     student_id = models.ForeignKey(User,on_delete=models.CASCADE)
