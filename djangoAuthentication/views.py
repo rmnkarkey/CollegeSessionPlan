@@ -6,6 +6,7 @@ from rest_framework_jwt.serializers import jwt_payload_handler
 from rest_framework.response import Response
 from django.conf import settings
 import jwt
+import json
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes,renderer_classes
@@ -302,7 +303,7 @@ def InsertSessionNameDetail(request,session_name):
             print(course.credit)
             if course.course_code == j:
                 course_session = SessionCourseTable.objects.create(session_name_id=session.session_name,session_session=session_session,courseCode_id=course.course_code,course_credit=course.credit,Offered="Yes")
-        return Response('saved')        
+        return Response('saved')
     else:
         session = SessionCourseTable.objects.all()
         sessionSer = SessionCourseTableSerializer(session,many=True)
@@ -314,6 +315,26 @@ def listOfSession(request):
         session = SessionNameTable.objects.all()
         sessionSer = SessionNameSerializer(session,many=True)
         return Response(sessionSer.data)
+
+@api_view(['GET'])
+def SearchSessionNameDetail(request,session_name):
+    session = SessionCourseTable.objects.filter(session_name=session_name)
+    courseCodeList=[]
+    courseCredit=[]
+    for i in session:
+        courseCode=i.courseCode.course_name
+        course_credit=i.course_credit
+        # course=CourseManagement.objects.filter(course_code=courseCode)
+        # for i in course:
+        courseCodeList.append(courseCode)
+        courseCredit.append(course_credit)
+        # print(courseCodeList)
+    #     dictionary={
+    #         'courseCode':courseCode,
+    #         'course_credit':course_credit
+    #         }
+    # datas = json.dumps(dictionary)
+    return Response(courseCodeList)
 
 # @api_view(['GET','POST'])
 # def saveFunction(request):

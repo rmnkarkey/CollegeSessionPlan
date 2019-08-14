@@ -18,6 +18,7 @@ urlpatterns=[
     path('course-search/',views.SearchFuction,name='SearchFuction'),
     path('session-plan/',views.sessionPlan,name='sessionPlan'),
     path('session-name-insert/<slug:session_name>/',views.InsertSessionNameDetail,name='InsertSessionNameDetail'),
+    path('session-name-search/<slug:session_name>/',views.SearchSessionNameDetail,name='InsertSessionNameDetail'),
     path('session-name/',views.InsertSessionName),
     path('session-names/',views.listOfSession,name='listOfSession')
 
