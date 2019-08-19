@@ -25,6 +25,9 @@ class SessionNameTable(models.Model):
     max_credit = models.IntegerField()
     start_date = models.DateField(default=timezone.now().date())
     end_date = models.DateField(default=timezone.now().date())
+    
+    class Meta:
+        ordering=('-start_date',)
 
 class SessionCourseTable(models.Model):
     session_name = models.ForeignKey(SessionNameTable,on_delete=models.CASCADE)

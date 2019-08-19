@@ -20,6 +20,7 @@ urlpatterns=[
     path('session-name-insert/<slug:session_name>/',views.InsertSessionNameDetail,name='InsertSessionNameDetail'),
     path('session-name-search/<slug:session_name>/',views.SearchSessionNameDetail,name='InsertSessionNameDetail'),
     path('session-name/',views.InsertSessionName),
-    path('session-names/',views.listOfSession,name='listOfSession')
-
+    path('session-names/',views.listOfSession,name='listOfSession'),
+    path('App/sessions', views.SessionManagement.as_view()),
+    path('counter/',views.clickFunctionEvent)
 ]

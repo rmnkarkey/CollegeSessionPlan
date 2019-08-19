@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.decorators import api_view,permission_classes,renderer_classes
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from .models import CourseManagement,StudentManagement,GradeManagement,OfferedCourses,SessionNameTable,SessionCourseTable
+from .models import CourseManagement,StudentManagement,GradeManagement,OfferedCourses,SessionNameTable,SessionCourseTable,CourseEnrollment
 from .serializers import SessionNameSerializer,CourseSerializer,StudentSerializer,GradeManagementSerializer,StatusTableSerializer,SessionNameTableSerializer,SessionCourseTableSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
@@ -386,3 +386,92 @@ def SearchSessionNameDetail(request,session_name):
 #         return Response(sessionSer.data)
 #
 # @api_view(['GET','POST'])
+
+class SessionManagement(APIView):
+    # def get(self, request):
+    #     session = SessionNameTable.objects.all()
+    #     # sessioncourse = SessionNameTable.objects.filter(session_name = session[0].session_name)
+    #     # print(sessioncourse.course_code)
+    #     # courselist = []
+    #     # for i in session:
+    #     #     # course = CourseManagement.objects.get(course_code=i.course_code.course_code)
+    #     #     data_dict = {
+    #     #         'course_code':course.course_code,
+    #     #         'course_name':course.course_name,
+    #     #         'credit':course.credit,
+    #     #         'session_name':session[0].session_name,
+    #     #         'max_credit': session[0].max_credit
+    #     #     }
+    #     #     courselist.append(data_dict)
+    #     sessionSerializer = SessionNameTableSerializer(session[0])
+    #     return Response(sessionSerializer.data)
+    def get(self, request):
+        session = SessionNameTable.objects.all()
+        print(session[0])
+        sessioncourse = SessionCourseTable.objects.filter(session_name = session[0].session_name)
+        courselist = []
+        for i in sessioncourse:
+            course = CourseManagement.objects.get(course_code=i.courseCode.course_code)
+            data_dict = {
+                'course_code':course.course_code,
+                'course_name':course.course_name,
+                'credit':course.credit,
+                'session_name':session[0].session_name,
+                'max_credit': session[0].max_credit
+            }
+            courselist.append(data_dict)
+        return Response(courselist)
+
+    def post(self, request, *args, **kwargs):
+        session_name = request.data['sessionname']
+        print(session_name)
+        checkbox = request.data.get('checkbox')
+        print(checkbox)
+        max_credit = request.data['maxcredit']
+        print(max_credit)
+        total_credit = 0
+        course_credit_count = 0
+        for i in checkbox:
+            course = CourseManagement.objects.get(course_code = i)
+            course_credit_count = int(course.credit) + course_credit_count
+            if course.prerequisite:
+                try:
+                    grade = GradeManagement.objects.get(course_code=course.course_code)
+                    if grade.status == 'Pass':
+                        total_credit = total_credit + course.credit
+                        session_credit = SessionNameTable.objects.get(session_name = session_name)
+                        if total_credit <= session_credit.max_credit:
+                            enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+                            # print('enrolleddddddd')
+                except GradeManagement.DoesNotExist:
+                    total_credit = total_credit + course.credit
+                    session_credit = SessionNameTable.objects.get(session_name = session_name)
+                    if total_credit <= session_credit.max_credit:
+                        enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+            else:
+                try:
+                    grade = GradeManagement.objects.get(course_code=course.course_code)
+                    if grade.status == 'Pass':
+                        total_credit = total_credit + course.credit
+                        session_credit = SessionNameTable.objects.get(session_name = session_name)
+                        if total_credit <= session_credit.max_credit:
+                            enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+
+                except GradeManagement.DoesNotExist:
+                    total_credit = total_credit + course.credit
+                    session_credit = SessionNameTable.objects.get(session_name = session_name)
+                    if total_credit <= session_credit.max_credit:
+                        enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+
+
+@api_view(['GET','POST'])
+def clickFunctionEvent(request):
+    if request.method=="POST":
+        course_credit_count = 0
+        checkbox = request.data.get('checkbox')
+        print([checkbox])
+        for i in checkbox:
+            course = CourseManagement.objects.get(course_code = i)
+            course_credit_count = int(course.credit) + course_credit_count
+        print(course_credit_count)
+        return Response({'course_credit_count':course_credit_count})
