@@ -442,12 +442,15 @@ class SessionManagement(APIView):
                         session_credit = SessionNameTable.objects.get(session_name = session_name)
                         if total_credit <= session_credit.max_credit:
                             enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
-                            # print('enrolleddddddd')
+                        else:
+                            return Response('Can not exceed the max_credit')
                 except GradeManagement.DoesNotExist:
                     total_credit = total_credit + course.credit
                     session_credit = SessionNameTable.objects.get(session_name = session_name)
                     if total_credit <= session_credit.max_credit:
                         enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+                    else:
+                        return Response('Can not exceed the max_credit')
             else:
                 try:
                     grade = GradeManagement.objects.get(course_code=course.course_code)
@@ -456,13 +459,15 @@ class SessionManagement(APIView):
                         session_credit = SessionNameTable.objects.get(session_name = session_name)
                         if total_credit <= session_credit.max_credit:
                             enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
-
+                        else:
+                            return Response('Can not exceed the max_credit')
                 except GradeManagement.DoesNotExist:
                     total_credit = total_credit + course.credit
                     session_credit = SessionNameTable.objects.get(session_name = session_name)
                     if total_credit <= session_credit.max_credit:
                         enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
-
+                    else:
+                        return Response('Can not exceed the max_credit')
 
 @api_view(['GET','POST'])
 def clickFunctionEvent(request):

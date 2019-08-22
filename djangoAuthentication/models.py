@@ -25,7 +25,7 @@ class SessionNameTable(models.Model):
     max_credit = models.IntegerField()
     start_date = models.DateField(default=timezone.now().date())
     end_date = models.DateField(default=timezone.now().date())
-    
+
     class Meta:
         ordering=('-start_date',)
 
@@ -47,92 +47,92 @@ class StudentManagement(models.Model):
     date_created = models.DateField(default=timezone.now().date())
     current_year = models.IntegerField(default=1)
 
-class GradeManagement(models.Model):
-    university_id=models.ForeignKey(StudentManagement,on_delete=models.CASCADE)
-    course_code= models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
-    marks = models.FloatField(default=0)
-    internal_marks = models.FloatField(default=0)
-    grades = models.CharField(max_length=299)
-    status = models.CharField(max_length=288)
-    total_marks = models.FloatField(default=0)
+    class GradeManagement(models.Model):
+        university_id=models.ForeignKey(StudentManagement,on_delete=models.CASCADE)
+        course_code= models.ForeignKey(CourseManagement,on_delete=models.CASCADE)
+        marks = models.FloatField(default=0)
+        internal_marks = models.FloatField(default=0)
+        grades = models.CharField(max_length=299)
+        status = models.CharField(max_length=288)
+        total_marks = models.FloatField(default=0)
 
-    def set_grades_and_status(sender,instance,**kwargs):
-        if instance.marks >= 80 and instance.marks <= 100:
-            instance.status = 'Pass'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 80 and instance.total_marks <= 100:
-                instance.grade = "A"
+        def set_grades_and_status(sender,instance,**kwargs):
+            if instance.marks >= 80 and instance.marks <= 100:
+                instance.status = 'Pass'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 80 and instance.total_marks <= 100:
+                    instance.grade = "A"
 
-        elif instance.marks >= 75 and instance.marks <= 79:
-            instance.status = 'Pass'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 75 and instance.total_marks <= 79:
-                instance.grade = "A-"
+            elif instance.marks >= 75 and instance.marks <= 79:
+                instance.status = 'Pass'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 75 and instance.total_marks <= 79:
+                    instance.grade = "A-"
 
-        elif instance.marks >= 70 and instance.marks <= 74:
-            instance.status = 'Pass'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 80 and instance.total_marks <= 100:
-                instance.grade = "B+"
+            elif instance.marks >= 70 and instance.marks <= 74:
+                instance.status = 'Pass'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 80 and instance.total_marks <= 100:
+                    instance.grade = "B+"
 
-        elif instance.marks >= 65 and instance.marks <= 69:
-            instance.status = 'Pass'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 65 and instance.total_marks <= 69:
-                instance.grade = "B"
+            elif instance.marks >= 65 and instance.marks <= 69:
+                instance.status = 'Pass'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 65 and instance.total_marks <= 69:
+                    instance.grade = "B"
 
-        elif instance.marks >= 60 and instance.marks <= 64:
-            instance.status = 'Pass'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 60 and instance.total_marks <= 64:
-                instance.grade = "B-"
+            elif instance.marks >= 60 and instance.marks <= 64:
+                instance.status = 'Pass'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 60 and instance.total_marks <= 64:
+                    instance.grade = "B-"
 
-        elif instance.marks >= 55 and instance.marks <= 59:
-            instance.status = 'Pass'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 55 and instance.total_marks <= 59:
-                instance.grade = "C+"
+            elif instance.marks >= 55 and instance.marks <= 59:
+                instance.status = 'Pass'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 55 and instance.total_marks <= 59:
+                    instance.grade = "C+"
 
-        elif instance.marks >= 50 and instance.marks <= 54:
-            instance.status = 'Pass'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 50 and instance.total_marks <= 54:
-                instance.grade = "C"
+            elif instance.marks >= 50 and instance.marks <= 54:
+                instance.status = 'Pass'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 50 and instance.total_marks <= 54:
+                    instance.grade = "C"
 
-        elif instance.marks >= 40 and instance.marks <= 49:
-            instance.status = 'Fail'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 40 and instance.total_marks <= 49:
-                instance.grade = "C-"
+            elif instance.marks >= 40 and instance.marks <= 49:
+                instance.status = 'Fail'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 40 and instance.total_marks <= 49:
+                    instance.grade = "C-"
 
-        elif instance.marks >= 35 and instance.marks <= 39:
-            instance.status = 'Fail'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 35 and instance.total_marks <= 39:
-                instance.grade = "D+"
+            elif instance.marks >= 35 and instance.marks <= 39:
+                instance.status = 'Fail'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 35 and instance.total_marks <= 39:
+                    instance.grade = "D+"
 
-        elif instance.marks >= 33 and instance.marks <= 34:
-            instance.status = 'Fail'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 33 and instance.total_marks <= 34:
-                instance.grade = "D"
+            elif instance.marks >= 33 and instance.marks <= 34:
+                instance.status = 'Fail'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 33 and instance.total_marks <= 34:
+                    instance.grade = "D"
 
-        elif instance.marks >= 31 and instance.marks <= 32:
-            instance.status = 'Fail'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 31 and instance.total_marks <= 32:
-                instance.grade = "D-"
+            elif instance.marks >= 31 and instance.marks <= 32:
+                instance.status = 'Fail'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 31 and instance.total_marks <= 32:
+                    instance.grade = "D-"
 
-        elif instance.marks >= 0 and instance.marks <= 30:
-            instance.status = 'Fail'
-            instance.total_marks = float(instance.marks+instance.internal_marks)
-            if instance.total_marks >= 0 and instance.total_marks <= 30:
-                instance.grade = "F"
+            elif instance.marks >= 0 and instance.marks <= 30:
+                instance.status = 'Fail'
+                instance.total_marks = float(instance.marks+instance.internal_marks)
+                if instance.total_marks >= 0 and instance.total_marks <= 30:
+                    instance.grade = "F"
 
-        else:
-            instance.grades = 'NA'
-            instance.status = 'NA'
-pre_save.connect(GradeManagement.set_grades_and_status,sender=GradeManagement)
+            else:
+                instance.grades = 'NA'
+                instance.status = 'NA'
+    pre_save.connect(GradeManagement.set_grades_and_status,sender=GradeManagement)
 
 class StatusTable(models.Model):
     university_id = models.ForeignKey(StudentManagement,related_name="stud_id",on_delete=models.CASCADE)
