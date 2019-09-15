@@ -1,6 +1,6 @@
 from django.shortcuts import render,get_object_or_404
 from .forms import UserForm
-from django.contrib.auth import authenticate,login as lg
+from django.contrib.auth import authenticate,login as lg, logout as lout
 from django.contrib.auth.models import User
 from rest_framework_jwt.serializers import jwt_payload_handler
 from rest_framework.response import Response
@@ -34,7 +34,7 @@ def authenticate_users(request):
             userDetails['token']=token
             print(userDetails['token'])
             lg(request,user)
-            return Response(userDetails,status=status.HTTP_200_OK)
+            return Response(userDetails['token'],status=status.HTTP_200_OK)
         except Exception as e:
             raise e
     else:
@@ -55,6 +55,11 @@ def create_user(request):
     else:
         form=UserForm()
         return render(request,'signup.html',{'form':form})
+
+@api_view(['POST'])
+def logoutFunction(request):
+    lout(request)
+    return Response("logout successfull")
 
 @api_view(['GET'])
 def display(request):
@@ -138,6 +143,7 @@ def CourseDetail(request,course_code):
             return Response("Course found")
 
 @api_view(['GET','POST'])
+@permission_classes([AllowAny,])
 def FormsFunction(request):
     if request.method=="GET":
         grades = GradeManagement.objects.all()
@@ -161,6 +167,7 @@ def FormsFunction(request):
         return Response("Grade Added Succesfull")
 
 @api_view(['GET'])
+@permission_classes([AllowAny,])
 def statFunction(request):
     stats = StatusTable.objects.all()
     stat = StatusTableSerializer(stats,many=True)
@@ -246,6 +253,7 @@ def SearchFuction(request):
 
 #search Function for session
 @api_view(['GET','POST'])
+@permission_classes([AllowAny,])
 def sessionPlan(request):
     if request.method == "POST":
         session = request.data['session']
@@ -271,6 +279,7 @@ def sessionPlan(request):
 
 
 @api_view(['GET','POST'])
+@permission_classes([IsAuthenticated,])
 def InsertSessionName(request):
     if request.method=='POST':
         session_name=request.data['session_name']
@@ -279,30 +288,43 @@ def InsertSessionName(request):
         max_credit=request.data['max_credit']
         start_date=request.data['start_date']
         end_date=request.data['end_date']
-        session_name=SessionNameTable.objects.create(session_name=session_name,session_year=session_year,date_created=date_created,max_credit=max_credit,start_date=start_date,end_date=end_date)
-        return Response("Succesfully Saved")
+        sess = SessionNameTable.objects.filter(session_name=session_name)
+        for i in sess:
+            print(i.session_name)
+            if session_name == i.session_name:
+                erro = "CAN NOT USE SAME NAME FOR SESSION"
+                return Response(erro)
+        else:
+            session_name=SessionNameTable.objects.create(session_name=session_name,session_year=session_year,date_created=date_created,max_credit=max_credit,start_date=start_date,end_date=end_date)
+            return Response("Succesfully Saved")
     else:
         session = SessionNameTable.objects.all()
         sessionSer = SessionNameTableSerializer(session,many=True)
         return Response(sessionSer.data)
 
 @api_view(['GET','POST'])
+# @permission_classes([IsAuthenticated,])
 def InsertSessionNameDetail(request,session_name):
     if request.method=="POST":
         session = SessionNameTable.objects.get(session_name=session_name)
-        # print(session.session_name)
         session_session=request.data['session_session']
         offer = request.data.get('checkBox')
         courseCode = request.data.get('courseCode')
-        print('................')
-        print(courseCode)
-        print('................')
         course=''
         for j in courseCode:
             course = CourseManagement.objects.get(course_code=j)
-            print(course.credit)
             if course.course_code == j:
-                course_session = SessionCourseTable.objects.create(session_name_id=session.session_name,session_session=session_session,courseCode_id=course.course_code,course_credit=course.credit,Offered="Yes")
+                sessName = SessionNameTable.objects.get(session_name = session.session_name)
+                sess = SessionCourseTable.objects.filter(session_name_id = sessName)
+                if sess:
+                    for s in sess:
+                        if j == s.courseCode.course_code:
+                            return Response('COURSE ALREADY ADDED')
+                        else:
+                            course_session = SessionCourseTable.objects.create(session_name_id=session.session_name,session_session=session_session,courseCode_id=course.course_code,course_credit=course.credit,Offered="Yes")
+                else:
+                    course_session = SessionCourseTable.objects.create(session_name_id=session.session_name,session_session=session_session,courseCode_id=course.course_code,course_credit=course.credit,Offered="Yes")
+                    return Response('ADDED')
         return Response('saved')
     else:
         session = SessionCourseTable.objects.all()
@@ -310,6 +332,7 @@ def InsertSessionNameDetail(request,session_name):
         return Response(sessionSer.data)
 
 @api_view(['GET'])
+@permission_classes([AllowAny,])
 def listOfSession(request):
     if request.method=="GET":
         session = SessionNameTable.objects.all()
@@ -317,6 +340,7 @@ def listOfSession(request):
         return Response(sessionSer.data)
 
 @api_view(['GET'])
+@permission_classes([AllowAny,])
 def SearchSessionNameDetail(request,session_name):
     session = SessionCourseTable.objects.filter(session_name=session_name)
     courseCodeList=[]
@@ -470,6 +494,7 @@ class SessionManagement(APIView):
                         return Response('Can not exceed the max_credit')
 
 @api_view(['GET','POST'])
+@permission_classes([AllowAny,])
 def clickFunctionEvent(request):
     if request.method=="POST":
         course_credit_count = 0
