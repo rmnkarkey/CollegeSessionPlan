@@ -27,14 +27,35 @@ def authenticate_users(request):
     user = authenticate(username=username,password=password)
     if user:
         try:
-            payload=jwt_payload_handler(user)
-            token=jwt.encode(payload,settings.SECRET_KEY)
-            userDetails={}
-            userDetails['username']=user.username
-            userDetails['token']=token
-            print(userDetails['token'])
-            lg(request,user)
-            return Response(userDetails['token'],status=status.HTTP_200_OK)
+            if username=='admin':
+                payload=jwt_payload_handler(user)
+                token=jwt.encode(payload,settings.SECRET_KEY)
+                userDetails={}
+                userDetails['username']=user.username
+                userDetails['token']=token
+                print(userDetails['token'])
+                lg(request,user)
+                dictt = {
+                'user':False,
+                'admin':True,
+                'token':userDetails['token']
+                }
+                return Response(dictt,status=status.HTTP_200_OK)
+            else:
+                payload=jwt_payload_handler(user)
+                token=jwt.encode(payload,settings.SECRET_KEY)
+                userDetails={}
+                userDetails['username']=user.username
+                userDetails['token']=token
+                print(userDetails['token'])
+                lg(request,user)
+                dictt = {
+                'user':True,
+                'admin':False,
+                'token':userDetails['token']
+                }
+                return Response(dictt,status=status.HTTP_200_OK)
+
         except Exception as e:
             raise e
     else:
