@@ -17,12 +17,15 @@ from .serializers import SessionNameSerializer,CourseSerializer,StudentSerialize
 from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
 from django.utils import timezone
+from django.http import JsonResponse
+
+specificUser = []
 
 @api_view(['POST'])
 @permission_classes([AllowAny,])
 def authenticate_users(request):
     username=request.data['username']
-    print(username)
+    # print(username)
     password=request.data['password']
     user = authenticate(username=username,password=password)
     if user:
@@ -32,8 +35,9 @@ def authenticate_users(request):
                 token=jwt.encode(payload,settings.SECRET_KEY)
                 userDetails={}
                 userDetails['username']=user.username
+                specificUser.append(user.username)
                 userDetails['token']=token
-                print(userDetails['token'])
+                # print(userDetails['token'])
                 lg(request,user)
                 dictt = {
                 'user':False,
@@ -46,8 +50,9 @@ def authenticate_users(request):
                 token=jwt.encode(payload,settings.SECRET_KEY)
                 userDetails={}
                 userDetails['username']=user.username
+                specificUser.append(user.username)
                 userDetails['token']=token
-                print(userDetails['token'])
+                # print(userDetails['token'])
                 lg(request,user)
                 dictt = {
                 'user':True,
@@ -80,6 +85,7 @@ def create_user(request):
 @api_view(['POST'])
 def logoutFunction(request):
     lout(request)
+    specificUser.clear()
     return Response("logout successfull")
 
 @api_view(['GET'])
@@ -106,6 +112,24 @@ class CourseView(APIView):
             return Response(serializer.data,status = status.HTTP_200_OK)
         else:
             return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST  )
+
+@api_view(['GET','POST'])
+def studentProfile(request):
+    # print(str(specificUser))
+    for i in specificUser:
+        # print(i)
+        user = User.objects.get(username=i)
+        # print(user)
+        student = StudentManagement.objects.get(student_id=user)
+        print(student.university_id)
+        dictionaryy={
+            'university_id':student.university_id,
+            'full_name':student.full_name,
+            'email':student.email,
+            'enrolled_year':student.enrolled_year,
+            'enrolled_session':student.enrolled_session
+            }
+    return Response(dictionaryy)
 
 class StudentView(APIView):
     def get(self,request):
@@ -468,32 +492,45 @@ class SessionManagement(APIView):
         return Response(courselist)
 
     def post(self, request, *args, **kwargs):
+        student_name = request.data['studentName']
+        # print('..............................',student_name)
         session_name = request.data['sessionname']
-        print(session_name)
+        # print(session_name)
         checkbox = request.data.get('checkbox')
-        print(checkbox)
+        print('...//////////////////////',checkbox)
         max_credit = request.data['maxcredit']
-        print(max_credit)
+        # print(max_credit)
         total_credit = 0
         course_credit_count = 0
+        print('....................................here1.................')
+
         for i in checkbox:
+            print('....................................here2.................')
+
             course = CourseManagement.objects.get(course_code = i)
             course_credit_count = int(course.credit) + course_credit_count
-            if course.prerequisite:
+            if course.prerequisite != None:
                 try:
+                    print('....................................here3.................')
+
                     grade = GradeManagement.objects.get(course_code=course.course_code)
                     if grade.status == 'Pass':
                         total_credit = total_credit + course.credit
                         session_credit = SessionNameTable.objects.get(session_name = session_name)
                         if total_credit <= session_credit.max_credit:
-                            enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+                            stud = StudentManagement.objects.get(university_id=student_name)
+
+                            enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
                         else:
                             return Response('Can not exceed the max_credit')
                 except GradeManagement.DoesNotExist:
+                    print('....................................here4.................')
                     total_credit = total_credit + course.credit
                     session_credit = SessionNameTable.objects.get(session_name = session_name)
                     if total_credit <= session_credit.max_credit:
-                        enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+                        stud = StudentManagement.objects.get(university_id=student_name)
+                        print(stud.university_id)
+                        enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
                     else:
                         return Response('Can not exceed the max_credit')
             else:
@@ -503,14 +540,17 @@ class SessionManagement(APIView):
                         total_credit = total_credit + course.credit
                         session_credit = SessionNameTable.objects.get(session_name = session_name)
                         if total_credit <= session_credit.max_credit:
-                            enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+                            stud = StudentManagement.objects.get(university_id=student_name)
+                            print(stud,'././././././././././.')
+                            enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
                         else:
                             return Response('Can not exceed the max_credit')
                 except GradeManagement.DoesNotExist:
                     total_credit = total_credit + course.credit
                     session_credit = SessionNameTable.objects.get(session_name = session_name)
                     if total_credit <= session_credit.max_credit:
-                        enroll = CourseEnrollment.objects.create(univ_id_id = 99, courseCode_id = course.course_code)
+                        stud = StudentManagement.objects.get(university_id=student_name)
+                        enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
                     else:
                         return Response('Can not exceed the max_credit')
 
@@ -526,3 +566,35 @@ def clickFunctionEvent(request):
             course_credit_count = int(course.credit) + course_credit_count
         print(course_credit_count)
         return Response({'course_credit_count':course_credit_count})
+#
+# for i in specificUser:
+#     # print(i)
+#     user = User.objects.get(username=i)
+#     # print(user)
+#     student = StudentManagement.objects.get(student_id=user)
+#     print(student.university_id)
+#     dictionaryy={
+#         'university_id':student.university_id,
+#         'full_name':student.full_name,
+#         'email':student.email,
+#         'enrolled_year':student.enrolled_year,
+#         'enrolled_session':student.enrolled_session
+#         }
+
+
+
+@api_view(['GET','POST'])
+@permission_classes([AllowAny,])
+def SpecificCourse(request):
+    lists = []
+    for i in specificUser:
+        user = User.objects.get(username = i)
+        student =StudentManagement.objects.get(student_id = user)
+        course = CourseEnrollment.objects.filter(univ_id = student.university_id)
+
+        for j in course:
+            print(j.courseCode)
+            a= j.courseCode
+            lists.append(a)
+
+    return Response(str(lists))

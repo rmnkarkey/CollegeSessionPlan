@@ -23,5 +23,7 @@ urlpatterns=[
     path('session-names/',views.listOfSession,name='listOfSession'),
     path('App/sessions', views.SessionManagement.as_view()),
     path('counter/',views.clickFunctionEvent),
-    path('logout/',views.logoutFunction)
+    path('logout/',views.logoutFunction),
+    path('profile/', views.studentProfile),
+    path('usercourse/', views.SpecificCourse),
 ]
