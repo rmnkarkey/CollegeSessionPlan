@@ -587,14 +587,19 @@ def clickFunctionEvent(request):
 @permission_classes([AllowAny,])
 def SpecificCourse(request):
     lists = []
+    # dictt={}
     for i in specificUser:
         user = User.objects.get(username = i)
         student =StudentManagement.objects.get(student_id = user)
         course = CourseEnrollment.objects.filter(univ_id = student.university_id)
 
         for j in course:
-            print(j.courseCode)
-            a= j.courseCode
+            a= j.courseCode.course_name
             lists.append(a)
-
-    return Response(str(lists))
+            dictt = {
+            'courses':j.courseCode.course_code
+            }
+            print(dictt,'grrrrrrrrrrrrrrrr')
+            # print(j.courseCode.course_code)
+    print(dictt,'.................')
+    return Response(lists)
