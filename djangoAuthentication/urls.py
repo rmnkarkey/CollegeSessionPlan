@@ -11,7 +11,7 @@ urlpatterns=[
     path('signup/',csrf_exempt(views.create_user),name='signup'),
     path('courses/',views.CourseView.as_view(),name='course'),
     path('courses/<slug:course_code>/',views.CourseDetail,name='courseDetail'),
-    path('student/',views.StudentView.as_view()),
+    path('student/',views.StudentView),
     path('forms/',views.FormsFunction,name='FormsFunction'),
     path('stats/',views.statFunction,name='statFunction'),
     path('available/',views.AvailableCourse,name='available'),

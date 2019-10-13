@@ -131,22 +131,49 @@ def studentProfile(request):
             }
     return Response(dictionaryy)
 
-class StudentView(APIView):
-    def get(self,request):
+@api_view(['GET','POST'])
+def StudentView(request):
+    if request.method=="POST":
+        full_name=request.data['full_name']
+        username=request.data['username']
+        email=request.data['email']
+        university_id=request.data['university_id']
+        enrolled_session=request.data['enrolled_session']
+        password=request.data['password']
+        status=request.data['status']
+        enrolled_year=request.data['enrolled_year']
+        date_created=request.data['date_created']
+
+        studentUser=User.objects.create_user(username=username,password=password)
+        print(studentUser,'/.............../.././././.')
+        if studentUser:
+            studeObj = User.objects.get(username=username)
+            stud = StudentManagement.objects.create(student_id_id=studeObj.id,full_name=full_name,university_id=university_id,email=email,enrolled_year=enrolled_year,enrolled_session=enrolled_session,password=password,date_created=date_created)
+            return Response("Student Added")
+        else:
+            print('not created')
+            return Response("Student Not Added")
+
+    elif request.method=="GET":
         student=StudentManagement.objects.all()
         serilizer = StudentSerializer(student,many=True)
         return Response(serilizer.data)
-
-    def post(self,request,*args,**kwargs):
-        data =request.data
-        print(data)
-        print('............')
-        serializer = StudentSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status = status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST  )
+# class StudentView(APIView):
+#     def get(self,request):
+#         student=StudentManagement.objects.all()
+#         serilizer = StudentSerializer(student,many=True)
+#         return Response(serilizer.data)
+#
+#     def post(self,request,*args,**kwargs):
+#         data =request.data
+#         print(data)
+#         print('............')
+#         serializer = StudentSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data,status = status.HTTP_200_OK)
+#         else:
+#             return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST  )
 
 @api_view(['GET','POST','DELETE'])
 @permission_classes([AllowAny,])
@@ -324,7 +351,7 @@ def sessionPlan(request):
 
 
 @api_view(['GET','POST'])
-@permission_classes([IsAuthenticated,])
+@permission_classes([AllowAny,])
 def InsertSessionName(request):
     if request.method=='POST':
         session_name=request.data['session_name']
