@@ -599,7 +599,7 @@ def SpecificCourse(request):
             dictt = {
             'courses':j.courseCode.course_code
             }
-            print(dictt,'grrrrrrrrrrrrrrrr')
+            print(dictt,'.......')
             # print(j.courseCode.course_code)
     print(dictt,'.................')
     return Response(lists)
