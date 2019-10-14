@@ -382,6 +382,7 @@ def InsertSessionNameDetail(request,session_name):
         session_session=request.data['session_session']
         offer = request.data.get('checkBox')
         courseCode = request.data.get('courseCode')
+        print(courseCode,'........................................')
         course=''
         for j in courseCode:
             course = CourseManagement.objects.get(course_code=j)
@@ -396,8 +397,7 @@ def InsertSessionNameDetail(request,session_name):
                             course_session = SessionCourseTable.objects.create(session_name_id=session.session_name,session_session=session_session,courseCode_id=course.course_code,course_credit=course.credit,Offered="Yes")
                 else:
                     course_session = SessionCourseTable.objects.create(session_name_id=session.session_name,session_session=session_session,courseCode_id=course.course_code,course_credit=course.credit,Offered="Yes")
-                    return Response('ADDED')
-        return Response('saved')
+        return Response('ADDED')
     else:
         session = SessionCourseTable.objects.all()
         sessionSer = SessionCourseTableSerializer(session,many=True)
