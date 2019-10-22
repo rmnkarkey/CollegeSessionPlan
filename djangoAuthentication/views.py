@@ -630,3 +630,30 @@ def SpecificCourse(request):
             # print(j.courseCode.course_code)
     print(dictt,'.................')
     return Response(lists)
+
+@api_view(['GET','POST'])
+def courseLists(request):
+    lists=[]
+    courses = CourseManagement.objects.all()
+    for i in courses:
+        lists.append(i.course_code)
+    return Response(lists)
+
+@api_view(['GET','POST'])
+def registerdUsersOnCourse(request,course_code):
+    lists=[]
+    course = CourseManagement.objects.get(course_code=course_code)
+    courseEnr = CourseEnrollment.objects.filter(courseCode=course.course_code)
+    for i in courseEnr:
+        student = StudentManagement.objects.get(university_id=i.univ_id.university_id)
+        lists.append(student.full_name)
+    return Response(lists)
+
+@api_view(['GET','POST'])
+def postGrade(request):
+    marks = request.data['marks']
+    print(marks)
+    username = request.data['username']
+    print(',,,,,,')
+    print(username,'..,.,.,/./,/,/./,/.,/.')
+    courseName = request.data['coursename']
