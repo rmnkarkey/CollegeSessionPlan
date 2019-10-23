@@ -359,10 +359,10 @@ def InsertSessionName(request):
         date_created=timezone.now().date()
         max_credit=request.data['max_credit']
         start_date=request.data['start_date']
+        print(start_date,'.........................................../././/.')
         end_date=request.data['end_date']
         sess = SessionNameTable.objects.filter(session_name=session_name)
         for i in sess:
-            print(i.session_name)
             if session_name == i.session_name:
                 erro = "CAN NOT USE SAME NAME FOR SESSION"
                 return Response(erro)
@@ -621,7 +621,7 @@ def SpecificCourse(request):
         course = CourseEnrollment.objects.filter(univ_id = student.university_id)
 
         for j in course:
-            a= j.courseCode.course_name
+            a= j.courseCode.course_code
             lists.append(a)
             dictt = {
             'courses':j.courseCode.course_code
@@ -646,14 +646,31 @@ def registerdUsersOnCourse(request,course_code):
     courseEnr = CourseEnrollment.objects.filter(courseCode=course.course_code)
     for i in courseEnr:
         student = StudentManagement.objects.get(university_id=i.univ_id.university_id)
-        lists.append(student.full_name)
+        lists.append(student.university_id)
     return Response(lists)
 
 @api_view(['GET','POST'])
 def postGrade(request):
     marks = request.data['marks']
-    print(marks)
     username = request.data['username']
-    print(',,,,,,')
-    print(username,'..,.,.,/./,/,/./,/.,/.')
     courseName = request.data['coursename']
+    student = StudentManagement.objects.get(university_id=username)
+    # print(student.full_name)
+    course = CourseManagement.objects.get(course_code=courseName)
+    # print(course.course_name)
+    grade = GradeManagement.objects.create(university_id_id=student.university_id,course_code_id = course.course_code,marks=int(marks))
+    return Response('Successfully added grade')
+
+@api_view(['GET','POST'])
+def particularStudentResult(request,course_name):
+    course = CourseManagement.objects.get(course_code=course_name)
+    marks=0
+    for i in specificUser:
+        # print(i)
+        user = User.objects.get(username=i)
+        # print(user)
+        student = StudentManagement.objects.get(student_id=user)
+        grade = GradeManagement.objects.get(university_id_id=student.university_id,course_code_id=course.course_code)
+        print(grade.marks)
+        marks=grade.marks+marks
+    return Response(marks)

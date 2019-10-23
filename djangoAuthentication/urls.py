@@ -14,6 +14,7 @@ urlpatterns=[
     path('registered/<slug:course_code>/',views.registerdUsersOnCourse),
     path('grades/',views.postGrade),
     path('courses/<slug:course_code>/',views.CourseDetail,name='courseDetail'),
+    path('student-grade/<slug:course_name>/',views.particularStudentResult),
     path('student/',views.StudentView),
     path('forms/',views.FormsFunction,name='FormsFunction'),
     path('stats/',views.statFunction,name='statFunction'),
