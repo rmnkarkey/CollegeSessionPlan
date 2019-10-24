@@ -116,6 +116,7 @@ class CourseView(APIView):
 @api_view(['GET','POST'])
 def studentProfile(request):
     # print(str(specificUser))
+    dictionaryy={}
     for i in specificUser:
         # print(i)
         user = User.objects.get(username=i)
@@ -536,50 +537,58 @@ class SessionManagement(APIView):
 
             course = CourseManagement.objects.get(course_code = i)
             course_credit_count = int(course.credit) + course_credit_count
-            if course.prerequisite != None:
-                try:
-                    print('....................................here3.................')
+            stud = StudentManagement.objects.get(university_id=student_name)
 
-                    grade = GradeManagement.objects.get(course_code=course.course_code)
-                    if grade.status == 'Pass':
+            try:
+                courseEnroll = CourseEnrollment.objects.get(univ_id_id = stud.university_id,courseCode_id=course.course_code)
+                return Response("Course already registered")
+
+            except CourseEnrollment.DoesNotExist:
+                if course.prerequisite != None:
+                    try:
+                        print('....................................here3.................')
+                        stud = StudentManagement.objects.get(university_id=student_name)
+                        grade = GradeManagement.objects.get(course_code_id=course.course_code,university_id_id=stud.university_id)
+                        if grade.status == 'Pass':
+                            total_credit = total_credit + course.credit
+                            session_credit = SessionNameTable.objects.get(session_name = session_name)
+                            if total_credit <= session_credit.max_credit:
+                                enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
+                                return Response("Course Enrolled")
+                            else:
+                                return Response('Can not exceed the max_credit')
+                    except GradeManagement.DoesNotExist:
+                        print('....................................here4.................')
                         total_credit = total_credit + course.credit
                         session_credit = SessionNameTable.objects.get(session_name = session_name)
                         if total_credit <= session_credit.max_credit:
                             stud = StudentManagement.objects.get(university_id=student_name)
-
+                            print(stud.university_id)
                             enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
+                            return Response("Course Enrolled")
                         else:
                             return Response('Can not exceed the max_credit')
-                except GradeManagement.DoesNotExist:
-                    print('....................................here4.................')
-                    total_credit = total_credit + course.credit
-                    session_credit = SessionNameTable.objects.get(session_name = session_name)
-                    if total_credit <= session_credit.max_credit:
+                else:
+                    try:
                         stud = StudentManagement.objects.get(university_id=student_name)
-                        print(stud.university_id)
-                        enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
-                    else:
-                        return Response('Can not exceed the max_credit')
-            else:
-                try:
-                    grade = GradeManagement.objects.get(course_code=course.course_code)
-                    if grade.status == 'Pass':
+                        grade = GradeManagement.objects.get(course_code=course.course_code,university_id_id=stud.university_id)
+                        if grade.status == 'Pass':
+                            total_credit = total_credit + course.credit
+                            session_credit = SessionNameTable.objects.get(session_name = session_name)
+                            if total_credit <= session_credit.max_credit:
+                                enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
+                                return Response("Course Enrolled")
+                            else:
+                                return Response('Can not exceed the max_credit')
+                    except GradeManagement.DoesNotExist:
                         total_credit = total_credit + course.credit
                         session_credit = SessionNameTable.objects.get(session_name = session_name)
                         if total_credit <= session_credit.max_credit:
                             stud = StudentManagement.objects.get(university_id=student_name)
-                            print(stud,'././././././././././.')
                             enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
+                            return Response("Course Enrolled")
                         else:
                             return Response('Can not exceed the max_credit')
-                except GradeManagement.DoesNotExist:
-                    total_credit = total_credit + course.credit
-                    session_credit = SessionNameTable.objects.get(session_name = session_name)
-                    if total_credit <= session_credit.max_credit:
-                        stud = StudentManagement.objects.get(university_id=student_name)
-                        enroll = CourseEnrollment.objects.create(univ_id_id = stud.university_id, courseCode_id = course.course_code)
-                    else:
-                        return Response('Can not exceed the max_credit')
 
 @api_view(['GET','POST'])
 @permission_classes([AllowAny,])
@@ -628,7 +637,6 @@ def SpecificCourse(request):
             }
             print(dictt,'.......')
             # print(j.courseCode.course_code)
-    print(dictt,'.................')
     return Response(lists)
 
 @api_view(['GET','POST'])
@@ -658,8 +666,14 @@ def postGrade(request):
     # print(student.full_name)
     course = CourseManagement.objects.get(course_code=courseName)
     # print(course.course_name)
-    grade = GradeManagement.objects.create(university_id_id=student.university_id,course_code_id = course.course_code,marks=int(marks))
-    return Response('Successfully added grade')
+    try:
+        grade = GradeManagement.objects.get(university_id_id=student.university_id,course_code_id=course.course_code)
+        # print(grade.marks)
+        # marks=grade.marks+marks
+        return Response("marks already added")
+    except GradeManagement.DoesNotExist:
+        grade = GradeManagement.objects.create(university_id_id=student.university_id,course_code_id = course.course_code,marks=int(marks))
+        return Response('Successfully added marks')
 
 @api_view(['GET','POST'])
 def particularStudentResult(request,course_name):
@@ -670,7 +684,10 @@ def particularStudentResult(request,course_name):
         user = User.objects.get(username=i)
         # print(user)
         student = StudentManagement.objects.get(student_id=user)
-        grade = GradeManagement.objects.get(university_id_id=student.university_id,course_code_id=course.course_code)
-        print(grade.marks)
-        marks=grade.marks+marks
-    return Response(marks)
+        try:
+            grade = GradeManagement.objects.get(university_id_id=student.university_id,course_code_id=course.course_code)
+            print(grade.marks)
+            marks=grade.marks+marks
+            return Response(marks)
+        except GradeManagement.DoesNotExist:
+            return Response("Result Not Published Yet!!")
