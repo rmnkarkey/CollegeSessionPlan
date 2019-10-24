@@ -57,51 +57,51 @@ class GradeManagement(models.Model):
     def set_grades_and_status(sender,instance,**kwargs):
         if instance.marks >= 80 and instance.marks <= 100:
             instance.status = 'Pass'
-            instance.grade = "A"
+            instance.grades = "A"
 
         elif instance.marks >= 75 and instance.marks <= 79:
             instance.status = 'Pass'
-            instance.grade = "A-"
+            instance.grades = "A-"
 
         elif instance.marks >= 70 and instance.marks <= 74:
             instance.status = 'Pass'
-            instance.grade = "B+"
+            instance.grades = "B+"
 
         elif instance.marks >= 65 and instance.marks <= 69:
             instance.status = 'Pass'
-            instance.grade = "B"
+            instance.grades = "B"
 
         elif instance.marks >= 60 and instance.marks <= 64:
             instance.status = 'Pass'
-            instance.grade = "B-"
+            instance.grades= "B-"
 
         elif instance.marks >= 55 and instance.marks <= 59:
             instance.status = 'Pass'
-            instance.grade = "C+"
+            instance.grades = "C+"
 
         elif instance.marks >= 50 and instance.marks <= 54:
             instance.status = 'Pass'
-            instance.grade = "C"
+            instance.grades = "C"
 
         elif instance.marks >= 40 and instance.marks <= 49:
             instance.status = 'Fail'
-            instance.grade = "C-"
+            instance.grades = "C-"
 
         elif instance.marks >= 35 and instance.marks <= 39:
             instance.status = 'Fail'
-            instance.grade = "D+"
+            instance.grades = "D+"
 
         elif instance.marks >= 33 and instance.marks <= 34:
             instance.status = 'Fail'
-            instance.grade = "D"
+            instance.grades = "D"
 
         elif instance.marks >= 31 and instance.marks <= 32:
             instance.status = 'Fail'
-            instance.grade = "D-"
+            instance.grades = "D-"
 
         elif instance.marks >= 0 and instance.marks <= 30:
             instance.status = 'Fail'
-            instance.grade = "F"
+            instance.grades = "F"
 
         else:
             instance.grades = 'NA'

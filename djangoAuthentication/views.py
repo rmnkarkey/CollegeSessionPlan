@@ -687,7 +687,14 @@ def particularStudentResult(request,course_name):
         try:
             grade = GradeManagement.objects.get(university_id_id=student.university_id,course_code_id=course.course_code)
             print(grade.marks)
-            marks=grade.marks+marks
-            return Response(marks)
+            diction={
+                'marks':grade.marks+marks,
+                'status':grade.status,
+                'grades':grade.grades
+            }
+            return Response(diction)
         except GradeManagement.DoesNotExist:
-            return Response("Result Not Published Yet!!")
+            dictionn={
+            'error':"Result Not Published Yet!!"
+            }
+            return Response(dictionn)
