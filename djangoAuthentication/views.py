@@ -120,7 +120,7 @@ def studentProfile(request):
     for i in specificUser:
         # print(i)
         user = User.objects.get(username=i)
-        # print(user)
+        print(user)
         student = StudentManagement.objects.get(student_id=user)
         print(student.university_id)
         dictionaryy={
@@ -149,6 +149,7 @@ def StudentView(request):
         print(studentUser,'/.............../.././././.')
         if studentUser:
             studeObj = User.objects.get(username=username)
+            print('..............................',studeObj.id)
             stud = StudentManagement.objects.create(student_id_id=studeObj.id,full_name=full_name,university_id=university_id,email=email,enrolled_year=enrolled_year,enrolled_session=enrolled_session,password=password,date_created=date_created)
             return Response("Student Added")
         else:
